@@ -3,6 +3,7 @@ import os
 import sys
 import re
 import bibtexparser
+import functools
 import pdb
 
 root_dir = sys.argv[1]
@@ -23,23 +24,37 @@ for file, db in dbs.items():
     print(file)
     entry_count = len(db.entries)
     for i, entry in enumerate(db.entries):
-        id = entry['ID']
-        title = entry['title']
-        title_parts = [part for part in re.split(r'\W', title) if part != '']
         print("{:.2%}".format(i / entry_count))
-        if merged.entries:
-            for other_entry in merged.entries:
-                other_title = other_entry['title']
-                other_title_parts = [part for part in re.split(r'\W', other_title) if part != '']
-                common_parts = [part for part in title_parts if part in other_title_parts]
-                jaccard_title = len(common_parts) / (len(title_parts) + len(other_title_parts) - len(common_parts))
-                if jaccard_title < .6:
-                    merged.entries.append(entry)
-                # else:
-                #     print("already added")
-                #     print("  merged:  {}".format(other_title))
-                #     print("  current: {}".format(title))
-        else:
-            merged.entries.append(entry)
+        merged.entries.append(entry)
 
-pdb.set_trace()
+
+@functools.lru_cache()
+def parts_of(title):
+    return [part for part in re.split(r'\W', title) if part != '']
+
+
+@functools.lru_cache()
+def jaccard_of(title, other_title):
+    title_parts = parts_of(title)
+    other_title_parts = parts_of(other_title)
+    common_parts = [part for part in title_parts if part in other_title_parts]
+    return len(common_parts) / (len(title_parts) + len(other_title_parts) - len(common_parts))
+
+
+deduped = bibtexparser.bibdatabase.BibDatabase()
+entry_count = len(merged.entries)
+for i, entry in enumerate(merged.entries):
+    id = entry['ID']
+    title = entry['title']
+    print("{:.2%} ({})".format(i / entry_count, len(deduped.entries)))
+    if entry in deduped.entries:
+        continue
+    if deduped.entries:
+        jaccard_title = max([jaccard_of(title, other_entry['title']) for other_entry in deduped.entries])
+        if jaccard_title < .6:
+            deduped.entries.append(entry)
+    else:
+        deduped.entries.append(entry)
+
+with open('merged.bib', 'w', encoding='utf8') as deduped_file:
+    bibtexparser.dump(deduped, deduped_file)
