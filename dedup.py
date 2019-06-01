@@ -9,6 +9,20 @@ import logging
 
 import pdb
 
+parser = argparse.ArgumentParser(
+    prog="bibHygeia DeDup",
+    description='Filtering duplicated entries based on Jaccard similarity by words.',
+    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument('-i', '--input_folder', type=str, required=True,
+                    help='input folder to searching *.bib files recursively')
+parser.add_argument('-o', '--output_file', type=str, required=True,
+                    help='input folder to searching *.bib files recursively')
+parser.add_argument('-e', '--exclude_pattern', type=str, default=None, required=False,
+                    help='regular expression to exclude irrelevant sub-folder')
+
+args = parser.parse_args()
+print(args.accumulate(args.integers))
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
