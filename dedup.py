@@ -10,33 +10,37 @@ import logging
 import pdb
 
 parser = argparse.ArgumentParser(
-    prog="bibHygeia DeDup",
-    description='Filtering duplicated entries based on Jaccard similarity by words.',
+    prog="dedup.py",
+    description='bibHygeia DeDup: Filtering duplicated entries based on Jaccard similarity by words.',
+    epilog='DeDup is part of bibHygeia toolkit.',
     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('-i', '--input_folder', type=str, required=True,
                     help='input folder to searching *.bib files recursively')
-parser.add_argument('-o', '--output_file', type=str, required=True,
+parser.add_argument('-o', '--output_file', type=str, default='merged.bib', required=False,
                     help='input folder to searching *.bib files recursively')
 parser.add_argument('-e', '--exclude_pattern', type=str, default=None, required=False,
                     help='regular expression to exclude irrelevant sub-folder')
+parser.add_argument('-p', '--inspected_property', type=str, default='title', required=False,
+                    help='the property of the entries to check for similarity')
+parser.add_argument('-l', '--similarity_limit', type=float, default=.6, required=False,
+                    help='lower limit for similarity between entries which considered equal')
+parser.add_argument('--log', type=str, default='INFO', required=False,
+                    help='level of log messages to display')
 
 args = parser.parse_args()
-print(args.accumulate(args.integers))
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.getLevelName(args.log))
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
 logger.addHandler(handler)
 
-root_dir = sys.argv[1]
-exclude_pattern = None
-output_path = 'merged.bib'
-inspected_property = 'title'
-similarity_limit = .6
+root_dir = args.input_folder
+exclude_pattern = args.exclude_pattern
+output_path = args.output_file
+inspected_property = args.inspected_property
+similarity_limit = args.similarity_limit
 
-if len(sys.argv) > 2:
-    exclude_pattern = sys.argv[2]
 logger.info('searching Bibtex files in "{}", excluding "{}"'.format(root_dir, exclude_pattern))
 bibtex_files = glob2.glob(os.path.join(root_dir, '**', '*.bib'))
 dbs = {}
