@@ -1,5 +1,7 @@
 # bibHygeia Bibtex Toolkit
 
+<img src="/media/bibHygeia.png" alt="logo" width="200"/>
+
 This toolkit allows to automate some housekeeping around Bibtex files.
 
 ## DeDup - duplication finder and database merger
