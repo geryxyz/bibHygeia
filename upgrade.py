@@ -67,20 +67,16 @@ if __name__ == '__main__':
 
     logger.setLevel(logging.getLevelName(args.log))
 
-    upgrade_file = args.upgrade_file
-    root_dir = args.input_folder
-    exclude_pattern = args.exclude_pattern
-
-    upgrade: Upgrade = Upgrade.load(upgrade_file)
+    upgrade: Upgrade = Upgrade.load(args.upgrade_file)
     logger.info('{} replacements loaded'.format(len(upgrade)))
 
     tex_files = []
-    for file in glob2.glob(os.path.join(root_dir, '**', '*.tex')):
-        if exclude_pattern is not None and re.search(exclude_pattern, file):
+    for file in glob2.glob(os.path.join(args.input_folder, '**', '*.tex')):
+        if args.exclude_pattern is not None and re.search(args.exclude_pattern, file):
             continue
         tex_files.append(file)
     logger.info('{} LaTeX files found'.format(len(tex_files)))
-    if original.originals_in(root_dir):
+    if original.originals_in(args.input_folder):
         logger.error("original files present, remove them")
         sys.exit()
     for file in tex_files:
