@@ -37,12 +37,6 @@ handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
 logger.addHandler(handler)
 
-root_dir = args.input_folder
-exclude_pattern = args.exclude_pattern
-output_path = args.output_file
-inspected_property = args.inspected_property
-similarity_limit = args.similarity_limit
-
 
 class Similar:
     def __init__(self, saved, dropped, property):
@@ -51,14 +45,14 @@ class Similar:
         self.property = property
 
 
-logger.info('searching Bibtex files in "{}", excluding "{}"'.format(root_dir, exclude_pattern))
-bibtex_files = glob2.glob(os.path.join(root_dir, '**', '*.bib'))
+logger.info('searching Bibtex files in "{}", excluding "{}"'.format(args.input_folder, args.exclude_pattern))
+bibtex_files = glob2.glob(os.path.join(args.input_folder, '**', '*.bib'))
 
 parser = bibtexparser.bparser.BibTexParser(common_strings=True)
 
 dbs = {}
 for current_file in bibtex_files:
-    if exclude_pattern is not None and re.search(exclude_pattern, current_file):
+    if args.exclude_pattern is not None and re.search(args.exclude_pattern, current_file):
         continue
     logger.debug('loading {}'.format(current_file))
     with open(current_file, 'r', encoding="utf8") as bibtex_file:
@@ -94,28 +88,30 @@ def jaccard_of(value, other_value):
 
 
 side_effect = upgrade.Upgrade()
-logger.info('filtering duplicated entries inspecting: similarity("{}") < {}'.format(inspected_property, similarity_limit))
+logger.info(
+    'filtering duplicated entries inspecting: similarity("{}") < {}'.format(args.inspected_property,
+                                                                            args.similarity_limit))
 deduped = bibtexparser.bibdatabase.BibDatabase()
 entry_count = len(merged.entries)
 filtered_count = 0
 for i, entry in enumerate(merged.entries):
-    value = entry[inspected_property]
+    value = entry[args.inspected_property]
     logger.debug("{:.2%} ({})".format(i / entry_count, len(deduped.entries)))
     if entry in deduped.entries:
         continue
     if deduped.entries:
         similarity, other_entry = max(
-            [(jaccard_of(value, other_entry[inspected_property]), other_entry) for other_entry in deduped.entries],
+            [(jaccard_of(value, other_entry[args.inspected_property]), other_entry) for other_entry in deduped.entries],
             key=lambda e: e[0]
         )
-        if similarity < similarity_limit:
+        if similarity < args.similarity_limit:
             deduped.entries.append(entry)
         else:
             filtered_count += 1
             if other_entry['ID'] != entry['ID']:
                 replacement = upgrade.Replacement(
                     other_entry['ID'], entry['ID'],
-                    Similar(other_entry, entry, inspected_property))
+                    Similar(other_entry, entry, args.inspected_property))
                 side_effect.append(replacement)
     else:
         deduped.entries.append(entry)
@@ -123,6 +119,6 @@ logger.info('{} ({:.2%}) entries are skipped'.format(filtered_count, filtered_co
 side_effect.save('side_effect')
 logger.info('side-effect file created for future upgrading your source files')
 
-logger.info('saving debuped database into "{}"'.format(output_path))
-with open(output_path, 'w', encoding='utf8') as deduped_file:
+logger.info('saving debuped database into "{}"'.format(args.output_file))
+with open(args.output_file, 'w', encoding='utf8') as deduped_file:
     bibtexparser.dump(deduped, deduped_file)
