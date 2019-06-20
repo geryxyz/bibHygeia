@@ -1,3 +1,5 @@
+import sys
+
 import jsonpickle
 import argparse
 import logging
@@ -5,6 +7,8 @@ import glob2
 import os
 import shutil
 import re
+import original
+import util
 
 import pdb
 
@@ -76,10 +80,14 @@ if __name__ == '__main__':
             continue
         tex_files.append(file)
     logger.info('{} LaTeX files found'.format(len(tex_files)))
+    if original.originals_in(root_dir):
+        logger.error("original files present, remove them")
+        sys.exit()
     for file in tex_files:
-        shutil.copyfile(file, file + '.original')
+        original.save_current_state(file)
     logger.info('original files are created to back-up if before changes')
 
+    action_count = 0
     for replacement in upgrade:
         logger.debug('replacing {} with {}'.format(replacement.original, replacement.new))
         for file in tex_files:
@@ -91,5 +99,7 @@ if __name__ == '__main__':
                     new_line = line
                     if replacement.original in line:
                         logger.debug('old cite found in {} at line#{}'.format(file, line_number))
+                        action_count += 1
                         new_line = line.replace(replacement.original, replacement.new)
                     out_file.write(new_line)
+    logger.info('{} cites were updated'.format(action_count))
