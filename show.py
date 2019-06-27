@@ -30,10 +30,14 @@ if __name__ == '__main__':
     input_ext = os.path.splitext(args.input)[-1].lower()
     if input_ext == '.ugr':
         upgrade: Upgrade = Upgrade.load(args.input)
-        for i, replacement in enumerate(upgrade):
-            if not args.id or (re.search(args.id, replacement.new) or re.search(args.id, replacement.original)):
-                logger.info('entry#{}'.format(i))
-                logger.info('{} --> {}'.format(replacement.original, replacement.new))
+        for replacement in sorted(upgrade, key=lambda r: r.original+r.new):
+            if not args.id:
+                logger.info("'{}' need to replace with '{}' because their are {}".format(
+                    replacement.original,
+                    replacement.new,
+                    type(replacement.reason).__name__))
+            elif re.search(args.id, replacement.new) or re.search(args.id, replacement.original):
+                logger.info("'{}' need to replace with '{}'".format(replacement.original, replacement.new))
                 try:
                     logger.info('reason: {}'.format(replacement.reason.human_readable()))
                 except AttributeError:
