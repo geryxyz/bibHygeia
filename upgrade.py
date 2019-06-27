@@ -42,6 +42,22 @@ class Upgrade(list):
             else:
                 raise TypeError("invalid upgrade file version")
 
+    def add_if_not_present(self, replacement):
+        if (replacement.original, replacement.new) not in [(r.original, r.new) for r in self]:
+            self.append(replacement)
+
+
+class Similar:
+    def __init__(self, saved, dropped, property):
+        self.saved = saved
+        self.dropped = dropped
+        self.property = property
+
+    def human_readable(self):
+        return "'{}' (dropped) is similar to '{}' (saved)".format(
+            self.dropped[self.property],
+            self.saved[self.property])
+
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
