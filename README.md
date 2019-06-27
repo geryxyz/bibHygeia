@@ -55,3 +55,38 @@ optional arguments:
                         (default: None)
   --log LOG             level of log messages to display (default: INFO)
 ```
+
+## Restore - handle saved state
+
+This tool can be used to restore or remove saved state stored in original files.
+
+### Usage
+```
+usage: restore.py [-h] -i INPUT_FOLDER [--drop_original DROP_ORIGINAL]
+                  [--log LOG]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT_FOLDER, --input_folder INPUT_FOLDER
+                        input folder to searching original files recursively
+                        (default: None)
+  --drop_original DROP_ORIGINAL
+                        remove all original files (default: False)
+  --log LOG             level of log messages to display (default: INFO)
+```
+
+## Show - display details
+
+This tool allow the user to inspect various items in supported files.
+
+```
+usage: show.py [-h] -i INPUT [--id ID] [--log LOG]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        input file or folder to inspect (default: None)
+  --id ID               Regular expression to select BibTeX id for the entry
+                        to inspect (default: None)
+  --log LOG             level of log messages to display (default: INFO)
+```
