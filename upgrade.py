@@ -45,7 +45,7 @@ class Upgrade(list):
 
 
 class Similar:
-    def __init__(self, saved, dropped, property, degree):
+    def __init__(self, dropped, saved, property, degree):
         self.saved = saved
         self.dropped = dropped
         self.property = property
