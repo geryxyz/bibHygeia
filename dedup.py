@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 if other_entry['ID'] != entry['ID']:
                     replacement = Replacement(
                         other_entry['ID'], entry['ID'],
-                        Similar(other_entry, entry, args.inspected_property))
+                        Similar(other_entry, entry, args.inspected_property, similarity))
                     side_effect.add_if_not_present(replacement)
         else:
             deduped.entries.append(entry)

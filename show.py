@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import re
 
 from upgrade import Upgrade
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
     if input_ext == '.ugr':
         upgrade: Upgrade = Upgrade.load(args.input)
         for i, replacement in enumerate(upgrade):
-            if not args.id or (replacement.new == args.id or replacement.original == args.id):
+            if not args.id or (re.search(args.id, replacement.new) or re.search(args.id, replacement.original)):
                 logger.info('entry#{}'.format(i))
                 logger.info('{} --> {}'.format(replacement.original, replacement.new))
                 try:

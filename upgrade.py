@@ -1,16 +1,13 @@
-import sys
-
-import jsonpickle
 import argparse
 import logging
-import glob2
 import os
-import shutil
 import re
-import original
-import util
+import sys
 
-import pdb
+import glob2
+import jsonpickle
+
+import original
 
 
 class Replacement:
@@ -48,14 +45,16 @@ class Upgrade(list):
 
 
 class Similar:
-    def __init__(self, saved, dropped, property):
+    def __init__(self, saved, dropped, property, degree):
         self.saved = saved
         self.dropped = dropped
         self.property = property
+        self.degree = degree
 
     def human_readable(self):
-        return "'{}' (dropped) is similar to '{}' (saved)".format(
+        return "'{}' (dropped) is {:.2%} similar to '{}' (saved)".format(
             self.dropped[self.property],
+            self.degree,
             self.saved[self.property])
 
 
