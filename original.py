@@ -7,6 +7,11 @@ import os
 _original_postfix = '.original'
 
 
+def has_original(file_path:str) -> bool:
+    original_path = file_path + _original_postfix
+    return os.path.isfile(original_path)
+
+
 def originals_in(directory) -> List[str]:
     originals = glob2.glob(os.path.join(directory, '**', '*{}'.format(_original_postfix)))
     return originals
