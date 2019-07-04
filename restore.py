@@ -2,6 +2,7 @@ import argparse
 import logging
 
 import original
+import util
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
@@ -16,7 +17,7 @@ if __name__ == '__main__':
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-i', '--input_folder', type=str, required=True,
                         help='input folder to searching original files recursively')
-    parser.add_argument('--drop_original', type=bool, required=False, default=False,
+    parser.add_argument('--drop_original', type=util.bool_switch, required=False, default=False,
                         help='remove all original files')
     parser.add_argument('--log', type=str, default='INFO', required=False,
                         help='level of log messages to display')
