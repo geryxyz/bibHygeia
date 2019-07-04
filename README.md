@@ -90,3 +90,41 @@ optional arguments:
                         to inspect (default: None)
   --log LOG             level of log messages to display (default: INFO)
 ```
+
+## Unify - regenerate properties and ids
+
+Unify allow the user to regenerate any target property including ids based other properties in the same entry.
+
+```
+usage: unify.py [-h] -i INPUT [-t TARGET] [-p PATTERN]
+                [--remove_special_chars REMOVE_SPECIAL_CHARS]
+                [--remove_unresolved_refs REMOVE_UNRESOLVED_REFS]
+                [--ignore_unresolved_refs IGNORE_UNRESOLVED_REFS] [--log LOG]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        input file to unify (default: None)
+  -t TARGET, --target TARGET
+                        name of the target property. Use "ID" for id.
+                        (default: ID)
+  -p PATTERN, --pattern PATTERN
+                        pattern to change the property value. Use
+                        "@{property}" for values of other properties (default:
+                        @{ID})
+  --remove_special_chars REMOVE_SPECIAL_CHARS
+                        if true, all special chars (\W) will be removed from
+                        substituted properties value (default: True)
+  --remove_unresolved_refs REMOVE_UNRESOLVED_REFS
+                        if true, all unresolved property reference will be
+                        removed from new value (default: True)
+  --ignore_unresolved_refs IGNORE_UNRESOLVED_REFS
+                        if true, all unresolved property reference will be
+                        ignored (default: False)
+  --log LOG             level of log messages to display (default: INFO)
+```
+
+For sample usage to regenerate ids consider pattern `@{author}:@{year}:@{title}` if you are using entries (resources) without `year` or `author` properties, like webpages.
+You could use `@{author}:@{year}` for a more "traditional" id for academic papers and books.
+Please note that all unresolved (pointing to non-existing properties) references will be removed by default,
+but you are able to override this behaviour.
