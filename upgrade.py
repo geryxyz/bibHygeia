@@ -58,6 +58,19 @@ class Similar:
             self.saved[self.property])
 
 
+class Regenerated:
+    def __init__(self, pattern, original, new):
+        self.pattern = pattern
+        self.original = original
+        self.new = new
+
+    def human_readable(self):
+        return '"{}" id is regenerated to "{}" based on "{}"'.format(
+            self.original['ID'],
+            self.new['ID'],
+            self.pattern)
+
+
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter('%(asctime)s [%(levelname)s] %(message)s'))
