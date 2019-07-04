@@ -110,7 +110,7 @@ if __name__ == '__main__':
         else:
             deduped.entries.append(entry)
     logger.info('{} ({:.2%}) entries are skipped'.format(filtered_count, filtered_count / entry_count))
-    side_effect.save('side_effect')
+    side_effect.save('side_effect.dedup')
     logger.info('side-effect file created for future upgrading your source files')
 
     logger.info('saving debuped database into "{}"'.format(args.output_file))
