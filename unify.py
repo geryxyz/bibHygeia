@@ -94,38 +94,35 @@ if __name__ == '__main__':
     new_db = bibtexparser.bibdatabase.BibDatabase()
     for old_entry in old_db.entries:
         logger.debug('processing entry "{}"'.format(old_entry['ID']))
-        new_value: str = args.pattern
+        new_target_value: str = args.pattern
         for name, value in old_entry.items():
-            var_pattern = '@{{{}}}'.format(name)
-            if var_pattern in new_value:
+            property_pattern = r'@[{]' + name + r'(:\w+)?[}]'
+            if re.search(property_pattern, new_target_value):
                 logger.debug('resolving "{}"'.format(name))
                 if args.remove_special_chars:
                     logger.debug('removing special chars')
-                    new_value = new_value.replace(
-                        var_pattern,
-                        drop_special_chars(value))
-                else:
-                    new_value = new_value.replace(var_pattern, value)
+                    value = drop_special_chars(value)
+                new_target_value = re.sub(property_pattern, value, new_target_value)
         new_entry = copy.deepcopy(old_entry)
-        if re.search(r'@\{[^{}]+\}', new_value):
+        if re.search(r'@\{[^{}]+\}', new_target_value):
             if not args.ignore_unresolved_refs:
                 if args.remove_unresolved_refs:
-                    new_value = re.sub(r'@\{[^{}]+\}', '', new_value)
+                    new_target_value = re.sub(r'@\{[^{}]+\}', '', new_target_value)
                 else:
-                    logger.error('there are unresolved references in "{}" while processing "{}"'.format(new_value, old_entry['ID']))
+                    logger.error('there are unresolved references in "{}" while processing "{}"'.format(new_target_value, old_entry['ID']))
                     sys.exit()
-        new_entry[args.target] = new_value
+        new_entry[args.target] = new_target_value
         new_db.entries.append(new_entry)
         if args.target == 'ID':
-            if new_value not in new_ids:
-                new_ids.add(new_value)
+            if new_target_value not in new_ids:
+                new_ids.add(new_target_value)
                 side_effect.add_if_not_present(Replacement(
                     old_entry[args.target], new_entry[args.target],
                     reason=Regenerated(args.pattern, old_entry, new_entry)))
             else:
-                logger.error('conflicting id "{}" detected while processing "{}"'.format(new_value, old_entry['ID']))
+                logger.error('conflicting id "{}" detected while processing "{}"'.format(new_target_value, old_entry['ID']))
                 sys.exit()
-        logger.debug('"{}" value of "{}" was replaced with "{}"'.format(old_entry[args.target], args.target, new_value))
+        logger.debug('"{}" value of "{}" was replaced with "{}"'.format(old_entry[args.target], args.target, new_target_value))
 
     logger.info('saving unified database')
     with open(args.input, 'w', encoding='utf8') as output_file:
