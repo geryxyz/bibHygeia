@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
     @functools.lru_cache()
     def parts_of(value):
-        return [part for part in re.split(r'\W', value) if part != '']
+        return [part.lower() for part in re.split(r'\W', value) if part != '']
 
 
     @functools.lru_cache()
@@ -99,6 +99,8 @@ if __name__ == '__main__':
                 key=lambda e: e[0]
             )
             if similarity < args.similarity_limit:
+                if entry['ID'] == 'GFS05' and other_entry['ID'] == 'GFS05':
+                    pdb.set_trace()
                 deduped.entries.append(entry)
             else:
                 filtered_count += 1
