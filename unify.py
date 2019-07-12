@@ -60,6 +60,14 @@ def enclose(open: str, close: str, text: str):
         return open + text + close
 
 
+def unloose(open: str, close: str, text: str):
+    levels = util.level_of(open, close, text)
+    if (0, 1) == levels[0] and (1, 0) == levels[-1] and not util.in_in(0, levels[1:-1]):
+        return text[1:-1]
+    else:
+        return text
+
+
 transcription_functions = {
     'nop': TranscriptionFunction(
         lambda x: x,
@@ -76,8 +84,11 @@ transcription_functions = {
     'pre_formatted': TranscriptionFunction(
         lambda x: enclose('{', '}', x),
         'mark as pre-formatted', 'It marks all values (if not already marked) as pre-formatted casing,'
-                                 ' enclosing it inside curly braces ({ }).'
-    )
+                                 ' enclosing it inside curly braces ({ }).'),
+    'post_formatted': TranscriptionFunction(
+        lambda x: unloose('{', '}', x),
+        'mark as post-formatted', 'It marks all values (if not already marked) as post-formatted casing,'
+                                  ' removing any top level curly braces ({ }).')
 }
 
 if __name__ == '__main__':
