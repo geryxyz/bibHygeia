@@ -42,6 +42,31 @@ def drop_special_chars(value: str):
     return other_special_chars.strip('_')
 
 
+class TranscriptionFunction:
+    def __init__(self, action, name, description):
+        self.action = action
+        self.name = name
+        self.description = description
+
+    def apply(self, value):
+        return self.action(value)
+
+
+transcription_functions = {
+    'nop': TranscriptionFunction(
+        lambda x: x,
+        'no-operation', 'It does nothing.'),
+    'lower': TranscriptionFunction(
+        lambda x: x.lower(),
+        'lower case', 'It converts the value to its lower case equivalent.'),
+    'upper': TranscriptionFunction(
+        lambda x: x.upper(),
+        'upper case', 'It converts the value to its upper case equivalent.'),
+    'drop_specials': TranscriptionFunction(
+        drop_special_chars,
+        'Remove non-alphanumeric chars', 'It removes or substitute non-alphanumeric characters with underscore (_).')
+}
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         prog="unify.py",
@@ -58,12 +83,19 @@ if __name__ == '__main__':
                         help='if true, all unresolved property reference will be removed from new value')
     parser.add_argument('--ignore_unresolved_refs', type=util.bool_switch, default=False, required=False,
                         help='if true, all unresolved property reference will be ignored')
+    parser.add_argument('--list_functions', action='store_true',
+                        help='list all the available transcription functions')
     parser.add_argument('--log', type=str, default='INFO', required=False,
                         help='level of log messages to display')
 
     args = parser.parse_args()
 
     logger.setLevel(logging.getLevelName(args.log))
+
+    if args.list_functions:
+        for function_id, function in transcription_functions.items():
+            logger.info('ID: {} name: {}\n{}'.format(function_id, function.name, function.description))
+        sys.exit()
 
     if args.ignore_unresolved_refs and args.remove_unresolved_refs:
         logger.error("can not remove and ignore unresolved references at the same time")
@@ -85,13 +117,6 @@ if __name__ == '__main__':
 
     side_effect = Upgrade()
 
-    transcription_functions = {
-        'nop': lambda x: x,
-        'lower': lambda x: x.lower(),
-        'upper': lambda x: x.upper(),
-        'drop_specials': drop_special_chars
-    }
-
     new_ids = set()
     logger.info('regenerating "{}" based on "{}"'.format(args.target, args.pattern))
     new_db = bibtexparser.bibdatabase.BibDatabase()
@@ -104,11 +129,12 @@ if __name__ == '__main__':
 
         for match in re.finditer(property_pattern, new_target_value):
             property_name = match.group('property')
-            functions = [func for func in match.group('functions').split(',') if func != '']
+            functions = match.group('functions')
+            functions = [func for func in functions.split(',') if func != '']
             function_processed_value = old_entry.get(property_name, '')
             for function_name in functions:
                 function = transcription_functions.get(function_name, transcription_functions['nop'])
-                new_function_processed_value = function(function_processed_value)
+                new_function_processed_value = function.apply(function_processed_value)
                 if function_name not in transcription_functions:
                     logger.warning(
                         'function "{}" is unknown, will be substituted with "no-operation"'.format(function_name))
@@ -117,7 +143,7 @@ if __name__ == '__main__':
                         function_name,
                         function_processed_value,
                         new_function_processed_value))
-                function_processed_value = function(function_processed_value)
+                function_processed_value = new_function_processed_value
             replacement_map[match.group(0)] = function_processed_value
         for replacement_pattern, replacement_value in replacement_map.items():
             if replacement_pattern in new_target_value:
