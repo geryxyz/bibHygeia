@@ -52,6 +52,14 @@ class TranscriptionFunction:
         return self.action(value)
 
 
+def enclose(open: str, close: str, text: str):
+    levels = util.level_of(open, close, text)
+    if (0, 1) == levels[0] and (1, 0) == levels[-1] and not util.in_in(0, levels[1:-1]):
+        return text
+    else:
+        return open + text + close
+
+
 transcription_functions = {
     'nop': TranscriptionFunction(
         lambda x: x,
@@ -64,7 +72,12 @@ transcription_functions = {
         'upper case', 'It converts the value to its upper case equivalent.'),
     'drop_specials': TranscriptionFunction(
         drop_special_chars,
-        'Remove non-alphanumeric chars', 'It removes or substitute non-alphanumeric characters with underscore (_).')
+        'remove non-alphanumeric chars', 'It removes or substitute non-alphanumeric characters with underscore (_).'),
+    'pre_formatted': TranscriptionFunction(
+        lambda x: enclose('{', '}', x),
+        'mark as pre-formatted', 'It marks all values (if not already marked) as pre-formatted casing,'
+                                 ' enclosing it inside curly braces ({ }).'
+    )
 }
 
 if __name__ == '__main__':
@@ -148,7 +161,7 @@ if __name__ == '__main__':
         for replacement_pattern, replacement_value in replacement_map.items():
             if replacement_pattern in new_target_value:
                 logger.debug('resolving "{}"'.format(replacement_pattern))
-                new_target_value = re.sub(replacement_pattern, replacement_value, new_target_value)
+                new_target_value = new_target_value.replace(replacement_pattern, replacement_value)
         new_entry = copy.deepcopy(old_entry)
         if re.search(r'@\{[^{}]+\}', new_target_value):
             if not args.ignore_unresolved_refs:

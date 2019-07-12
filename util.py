@@ -44,3 +44,27 @@ def query_yes_no(question, default="yes"):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' "
                              "(or 'y' or 'n').\n")
+
+
+def in_in(what, containers):
+    for container in containers:
+        if what in container:
+            return True
+    return False
+
+
+def level_of(open: str, close: str, text: str):
+    if len(open) > 1 or len(close) > 1:
+        raise ValueError('only single char allowed')
+    current_level = 0
+    levels = []
+    for char in text:
+        if char == open:
+            current_level += 1
+            levels.append((current_level-1, current_level))
+        elif char == close:
+            current_level -= 1
+            levels.append((current_level+1, current_level))
+        else:
+            levels.append((current_level,))
+    return levels
