@@ -68,6 +68,22 @@ def unloose(open: str, close: str, text: str):
         return text
 
 
+global_index = 0
+
+
+def index_if(x, check) -> str:
+    global global_index
+    global_index += 1
+    if check(x):
+        return 'no.' + str(global_index)
+    else:
+        return x
+
+
+def first_author_of(x: str):
+    if
+
+
 transcription_functions = {
     'nop': TranscriptionFunction(
         lambda x: x,
@@ -88,7 +104,16 @@ transcription_functions = {
     'post_formatted': TranscriptionFunction(
         lambda x: unloose('{', '}', x),
         'mark as post-formatted', 'It marks all values (if not already marked) as post-formatted casing,'
-                                  ' removing any top level curly braces ({ }).')
+                                  ' removing any top level curly braces ({ }).'),
+    'abbr': TranscriptionFunction(
+        lambda x: re.sub(r'[^A-Z]', '', x),
+        'abbreviation', 'It removes all characters expect upper case letters.'),
+    'index_if_empty': TranscriptionFunction(
+        lambda x: index_if(x, lambda y: y == ''),
+        'index if empty', 'It resolves the pattern as an increasing index if the value is empty.'),
+    'first_author': TranscriptionFunction(
+        bla
+    )
 }
 
 if __name__ == '__main__':
@@ -153,8 +178,10 @@ if __name__ == '__main__':
 
         for match in re.finditer(property_pattern, new_target_value):
             property_name = match.group('property')
-            functions = match.group('functions')
-            functions = [func for func in functions.split(',') if func != '']
+            raw_functions = match.group('functions')
+            functions = []
+            if raw_functions and ',' in raw_functions:
+                functions = [func for func in raw_functions.split(',') if func != '']
             function_processed_value = old_entry.get(property_name, '')
             for function_name in functions:
                 function = transcription_functions.get(function_name, transcription_functions['nop'])
