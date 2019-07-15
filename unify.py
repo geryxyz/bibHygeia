@@ -81,7 +81,11 @@ def index_if(x, check) -> str:
 
 
 def first_author_of(x: str):
-    if
+    AND = ' and '
+    if x and AND in x:
+        return x.split(AND)[0]
+    else:
+        return x
 
 
 transcription_functions = {
@@ -112,8 +116,8 @@ transcription_functions = {
         lambda x: index_if(x, lambda y: y == ''),
         'index if empty', 'It resolves the pattern as an increasing index if the value is empty.'),
     'first_author': TranscriptionFunction(
-        bla
-    )
+        first_author_of,
+        'first author only', 'It returns the first name in the list if the list contains the "and" keyword.'),
 }
 
 if __name__ == '__main__':
