@@ -1,15 +1,18 @@
 import glob2
 import os
-import sys
 import re
 import bibtexparser
 import functools
 import argparse
 import logging
 from upgrade import Upgrade, Replacement, Similar
-import copy
+from util import valid_bibtex_types
 
 import pdb
+
+
+def types_of(db):
+    return dict.fromkeys([entry['ENTRYTYPE'] for entry in db.entries])
 
 
 if __name__ == '__main__':
@@ -42,8 +45,9 @@ if __name__ == '__main__':
     logger.info('searching Bibtex files in "{}", excluding "{}"'.format(args.input_folder, args.exclude_pattern))
     bibtex_files = glob2.glob(os.path.join(args.input_folder, '**', '*.bib'))
 
-    parser = bibtexparser.bparser.BibTexParser(common_strings=True)
+    parser = bibtexparser.bparser.BibTexParser(common_strings=True, ignore_nonstandard_types=False)
 
+    logger.info('loading entries from {} files'.format(len(bibtex_files)))
     dbs = {}
     for current_file in bibtex_files:
         if args.exclude_pattern is not None and re.search(args.exclude_pattern, current_file):
@@ -53,7 +57,7 @@ if __name__ == '__main__':
             dbs[current_file] = bibtexparser.load(bibtex_file, parser)
     logger.info('{} files are loaded'.format(len(dbs)))
 
-    logger.info('reading entries')
+    logger.debug('reading entries')
     already_added = set()
     merged = bibtexparser.bibdatabase.BibDatabase()
     for file, db in dbs.items():
@@ -67,11 +71,9 @@ if __name__ == '__main__':
             merged.entries.append(entry)
     logger.info('{} entries load from {} databases'.format(len(merged.entries), len(dbs)))
 
-
     @functools.lru_cache()
     def parts_of(value):
         return [part.lower() for part in re.split(r'\W', value) if part != '']
-
 
     @functools.lru_cache()
     def jaccard_of(value, other_value):
@@ -118,3 +120,10 @@ if __name__ == '__main__':
     logger.info('saving debuped database into "{}"'.format(args.output_file))
     with open(args.output_file, 'w', encoding='utf8') as deduped_file:
         bibtexparser.dump(deduped, deduped_file)
+
+    detected_types = types_of(deduped)
+    invalid_types = set(detected_types) - set(valid_bibtex_types)
+    if invalid_types:
+        logger.warning('invalid BibTeX types detected. Consider changing them.')
+    for entry_type in invalid_types:
+        logger.warning('invalid BibTeX type "{}" detected after eliminating duplication'.format(entry_type))
