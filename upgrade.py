@@ -126,6 +126,10 @@ if __name__ == '__main__':
                         logger.debug('old cite found in {} at line#{}'.format(file, line_number + 1))
                         logger.debug('replacing {} with {}'.format(replacement.original, replacement.new))
                         action_count += 1
-                        new_line = line.replace(replacement.original, replacement.new)
+                        new_line = line\
+                            .replace('{' + replacement.original + '}', '{' + replacement.new + '}') \
+                            .replace('{' + replacement.original + ',', '{' + replacement.new + ',') \
+                            .replace(',' + replacement.original + '}', ',' + replacement.new + '}') \
+                            .replace(',' + replacement.original + ',', ',' + replacement.new + ',')
                 out_file.write(new_line)
     logger.info('{} cites were updated'.format(action_count))

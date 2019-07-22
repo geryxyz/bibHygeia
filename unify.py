@@ -37,8 +37,8 @@ def drop_special_chars(value: str):
         .replace('\\v', '')\
         .replace('\\t', '')\
         .replace('\\o', 'o')
-    other_special_chars = re.sub(r'\W+', '_', diacritic_dropped)
-    return other_special_chars.strip('_')
+    other_special_chars = re.sub(r'\W+', '-', diacritic_dropped)
+    return other_special_chars.strip('-')
 
 
 class TranscriptionFunction:
