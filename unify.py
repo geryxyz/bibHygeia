@@ -1,15 +1,14 @@
 import argparse
+import copy
 import logging
-import os
 import re
 import sys
+
 import bibtexparser
-import copy
-import pdb
 
 import original
-from upgrade import Upgrade, Replacement, Regenerated
 import util
+from upgrade import Upgrade, Replacement, Regenerated
 
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler()
