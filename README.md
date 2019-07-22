@@ -128,3 +128,30 @@ For sample usage to regenerate ids consider pattern `@{author}:@{year}:@{title}`
 You could use `@{author}:@{year}` for a more "traditional" id for academic papers and books.
 Please note that all unresolved (pointing to non-existing properties) references will be removed by default,
 but you are able to override this behaviour.
+
+## Set - re-set a property to a static value
+
+This tool allow to set the value of a property to a static value if curtain property match to a regular expression.
+
+```
+usage: set.py [-h] -i INPUT [-t TARGET] [-s SUBJECT] [-p PATTERN] [-v VALUE]
+              [--log LOG]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i INPUT, --input INPUT
+                        input file to unify (default: None)
+  -t TARGET, --target TARGET
+                        name of the target property. Use "ENTRYTYPE" for type.
+                        (default: ENTRYTYPE)
+  -s SUBJECT, --subject SUBJECT
+                        name of the subject property. Use "ENTRYTYPE" for
+                        type. (default: ENTRYTYPE)
+  -p PATTERN, --pattern PATTERN
+                        regex pattern to match the subject property value.
+                        (default: electronic)
+  -v VALUE, --value VALUE
+                        new value of the target property. (default: misc)
+  --log LOG             level of log messages to display (default: INFO)
+
+```
