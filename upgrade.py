@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import pdb
 import re
 import sys
 
@@ -112,18 +113,19 @@ if __name__ == '__main__':
     logger.info('original files are created to back-up if before changes')
 
     action_count = 0
-    for replacement in upgrade:
-        logger.debug('replacing {} with {}'.format(replacement.original, replacement.new))
-        for file in tex_files:
-            out_file_path = file
-            in_file_path = file + '.original'
-            with open(in_file_path, 'r', encoding='utf8') as in_file, open(out_file_path, 'w', encoding='utf8') as out_file:
-                line: str
-                for line_number, line in enumerate(in_file):
-                    new_line = line
+    for file in tex_files:
+        out_file_path = file
+        in_file_path = file + '.original'
+        logger.debug('inspecting {}'.format(out_file_path))
+        with open(in_file_path, 'r', encoding='utf8') as in_file, open(out_file_path, 'w', encoding='utf8') as out_file:
+            line: str
+            for line_number, line in enumerate(in_file):
+                new_line = line
+                for replacement in upgrade:
                     if replacement.original in line:
-                        logger.debug('old cite found in {} at line#{}'.format(file, line_number))
+                        logger.debug('old cite found in {} at line#{}'.format(file, line_number + 1))
+                        logger.debug('replacing {} with {}'.format(replacement.original, replacement.new))
                         action_count += 1
                         new_line = line.replace(replacement.original, replacement.new)
-                    out_file.write(new_line)
+                out_file.write(new_line)
     logger.info('{} cites were updated'.format(action_count))
