@@ -42,12 +42,14 @@ if __name__ == '__main__':
         sys.exit()
     original_file = original.save_current_state(args.input)
 
+    if args.target == 'ID':
+        logger.error("it is not allowed to change IDs to the same static value")
+        sys.exit()
+
     parser = bibtexparser.bparser.BibTexParser(common_strings=True, ignore_nonstandard_types=False)
 
     with open(original_file, 'r', encoding="utf8") as bibtex_file:
         old_db = bibtexparser.load(bibtex_file, parser)
-
-    side_effect = Upgrade()
 
     logger.info('re-setting "{}" to "{}" if {} match to {}'.format(args.target, args.value, args.subject, args.pattern))
     new_db = bibtexparser.bibdatabase.BibDatabase()
@@ -67,6 +69,3 @@ if __name__ == '__main__':
         bibtexparser.dump(new_db, output_file)
     logger.info('{} entries was saved, {} ({:.2%}) was changed'.format(
         len(new_db.entries), count, count / len(new_db.entries)))
-
-    side_effect.save('side_effect.set')
-    logger.info('side-effect file created for future upgrading your source files')
