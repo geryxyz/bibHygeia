@@ -1,0 +1,2 @@
+glob2==0.7
+bibtexparser==1.2.0
