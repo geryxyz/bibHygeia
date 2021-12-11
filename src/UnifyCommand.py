@@ -4,7 +4,7 @@ from argparse import ArgumentParser
 from src.Command import Command, bibhygeia_command
 
 
-@bibhygeia_command(name='unify', description='Unifies BibTeX records')
+@bibhygeia_command(name="unify", description="Unifies BibTeX records")
 class UnifyCommand(Command):
     """
     This Command unifies BibTeX records.
