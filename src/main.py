@@ -1,5 +1,5 @@
 import argparse
-from src.Command import registered_Commands
+import src.commands
 
 
 def main():
@@ -12,7 +12,7 @@ def main():
 
     subparsers = parser.add_subparsers(dest="command", metavar="COMMAND", required=True)
 
-    for cmd in registered_Commands:
+    for cmd in src.commands.registered_commands:
         subparser = subparsers.add_parser(cmd.name, help=cmd.description)
         subparser.set_defaults(func=cmd.run)
         cmd.make_parser(subparser)

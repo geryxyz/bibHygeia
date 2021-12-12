@@ -1,6 +1,7 @@
 import typing
 from argparse import ArgumentParser
-from src.Command import Command, bibhygeia_command
+
+from src.commands.Command import Command, bibhygeia_command
 from src.util import *
 
 

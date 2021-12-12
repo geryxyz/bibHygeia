@@ -1,7 +1,7 @@
 import typing
 from argparse import ArgumentParser
 
-from src.Command import Command, bibhygeia_command
+from src.commands.Command import Command, bibhygeia_command
 
 
 @bibhygeia_command(name="unify", description="Unifies BibTeX records")

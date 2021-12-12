@@ -6,6 +6,9 @@ import typing
 class Command(ABC):
     """
     Base class for commands in the bibHygeia application.
+
+    :param name: The name of the command.
+    :param description: The description of the command.
     """
 
     def __init__(self, name: str, description: str):
@@ -21,16 +24,19 @@ class Command(ABC):
         pass
 
 
-registered_Commands: typing.List[Command] = []
+registered_commands: typing.List[Command] = []
 
 
 def bibhygeia_command(name: str, description: str) -> type(Command):
     """
     Decorator for registering a command.
+
+    :param name: The name of the command.
+    :param description: The description of the command.
     """
 
     def inner(command_class: type(Command)) -> type(Command):
-        registered_Commands.append(command_class(name, description))
+        registered_commands.append(command_class(name, description))
         return command_class
 
     return inner
