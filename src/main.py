@@ -9,6 +9,7 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-ni", "--no-interaction", help="No interaction mode", action="store_true")
+    parser.add_argument("-V", "--version", action="version", version=f"%(prog)s {src.__version__}")
 
     subparsers = parser.add_subparsers(dest="command", metavar="COMMAND", required=True)
 
