@@ -13,12 +13,26 @@ def run_tests() -> None:
     file_dir_path = os.path.dirname(os.path.realpath(__file__))
 
     # -s is for printing out the program outputs
-    pytest.main([file_dir_path, "-s"])
+    pytest.main([file_dir_path, "-s", "--junitxml=test_results.xml"])
 
 
 def input_bib_files() -> typing.List[BibFile]:
+    """
+    Iterates over the bib files and yields the bib files.
+    """
+
     for bib_file in bibs:
         yield bib_file
+
+
+def input_biber_entries() -> typing.List[typing.Dict[str, typing.Any]]:
+    """
+    Iterates over the bib files and yields the biber entries.
+    """
+
+    for bib_file in bibs:
+        for db in bib_file.bibliography.entries:
+            yield db
 
 
 @bibhygeia_command(name="check", description="Checks BibTeX entries in the given path.")
