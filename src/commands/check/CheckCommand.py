@@ -5,18 +5,20 @@ from argparse import ArgumentParser
 
 from src.commands.Command import Command, bibhygeia_command
 from src.util import *
+from src.util.BibEntry import BibEntry
 
 bibs: typing.List[BibFile] = []
 
 
 def run_tests() -> None:
     file_dir_path = os.path.dirname(os.path.realpath(__file__))
+    config_file_path = "''"  # Ignore other config files
 
     # -s is for printing out the program outputs
-    pytest.main([file_dir_path, "-s", "--junitxml=test_results.xml"])
+    pytest.main([file_dir_path, "--junitxml=test_results.xml", "-c", config_file_path])
 
 
-def input_bib_files() -> typing.List[BibFile]:
+def input_biber_files() -> typing.List[BibFile]:
     """
     Iterates over the bib files and yields the bib files.
     """
@@ -25,14 +27,14 @@ def input_bib_files() -> typing.List[BibFile]:
         yield bib_file
 
 
-def input_biber_entries() -> typing.List[typing.Dict[str, typing.Any]]:
+def input_biber_entries() -> typing.List[BibEntry]:
     """
     Iterates over the bib files and yields the biber entries.
     """
 
     for bib_file in bibs:
-        for db in bib_file.bibliography.entries:
-            yield db
+        for entry in bib_file:
+            yield entry
 
 
 @bibhygeia_command(name="check", description="Checks BibTeX entries in the given path.")

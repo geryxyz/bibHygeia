@@ -1,8 +1,8 @@
-import typing
+from src.util.BibEntry import BibEntry
 
 
 class Quantifier(object):
-    def check(self, key: str, entry: typing.Dict[str, typing.Any]):
+    def check(self, key: str, entry: BibEntry):
         pass
 
 
@@ -10,8 +10,8 @@ class Mandatory(Quantifier):
     def __init__(self, name: str):
         self.name = name
 
-    def check(self, key: str, entry: typing.Dict[str, typing.Any]):
-        assert self.name in entry, \
+    def check(self, key: str, entry: BibEntry):
+        assert self.name in entry.fields, \
             'the field "%s" is mandatory in entry "%s"' % (self.name, key)
 
     def __str__(self):
@@ -22,8 +22,8 @@ class Forbidden(Quantifier):
     def __init__(self, name: str):
         self.name = name
 
-    def check(self, key: str, entry: typing.Dict[str, typing.Any]):
-        assert self.name not in entry, \
+    def check(self, key: str, entry: BibEntry):
+        assert self.name not in entry.fields, \
             'the field "%s" is forbidden in entry "%s"' % (self.name, key)
 
     def __str__(self):
@@ -34,8 +34,8 @@ class AllOf(Quantifier):
     def __init__(self, *names: str):
         self.names = names
 
-    def check(self, key: str, entry: typing.Dict[str, typing.Any]):
-        missing = set(self.names) - set(entry.keys())
+    def check(self, key: str, entry: BibEntry):
+        missing = set(self.names) - set(entry.fields.keys())
 
         assert len(missing) == 0, \
             'the fields "%s" are mandatory in entry "%s"' % (", ".join(missing), key)
@@ -48,8 +48,8 @@ class AtLeastOneOf(Quantifier):
     def __init__(self, *names: str):
         self.names = names
 
-    def check(self, key: str, entry: typing.Dict[str, typing.Any]):
-        assert len(set(self.names) & set(entry)) >= 1, \
+    def check(self, key: str, entry: BibEntry):
+        assert len(set(self.names) & set(entry.fields)) >= 1, \
             'at least one of "%s" fields are mandatory for "%s"' % (", ".join(self.names), key)
 
     def __str__(self):
@@ -60,8 +60,8 @@ class MaybeOneOf(Quantifier):
     def __init__(self, *names: str):
         self.names = names
 
-    def check(self, key: str, entry: typing.Dict[str, typing.Any]):
-        assert len(set(self.names) & set(entry)) <= 1, \
+    def check(self, key: str, entry: BibEntry):
+        assert len(set(self.names) & set(entry.fields)) <= 1, \
             'just one of "%s" fields are allowed for "%s"' % (", ".join(self.names), key)
 
     def __str__(self):
