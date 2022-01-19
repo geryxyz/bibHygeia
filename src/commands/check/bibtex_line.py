@@ -27,14 +27,6 @@ class EmptyLine(Line):
         super().__init__(raw, line_number)
 
 
-class CommentLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
-        self.pre_line: str = match.group('pre_line')
-        self.comment: str = match.group('comment')
-        self.line_number: int = line_number
-
-
 class EntryStartLine(Line):
     def __init__(self, raw: str, match: re.Match, line_number: int):
         super().__init__(raw, line_number)
@@ -94,12 +86,19 @@ class UnrecognizedLine(Line):
         super().__init__(raw, line_number)
 
 
+# Regexes:
+# EmptyLine:        ^\s*$
+# EntryStartLine:   ^(?P<pre_line>\s*)@(?P<type>[^\s]+)(?P<post_type>\s*)[{](?P<pre_key>\s*)(?P<key>[^\s]+)(?P<post_key>\s*),(?P<post_line>\s*)$
+# FieldLine:        ^(?P<pre_line>\s*)(?P<name>[^\s]+)(?P<post_name>\s*)=(?P<pre_value>\s*)(?P<value>.+)(?P<post_value>\s*),(?P<post_line>\s*)$
+# LastFieldLine:    ^(?P<pre_line>\s*)(?P<name>[^\s]+)(?P<post_name>\s*)=(?P<pre_value>\s*)(?P<value>.+)(?P<post_line>\s*)$
+# ClosingFieldLine: ^(?P<pre_line>\s*)(?P<name>[^\s]+)(?P<post_name>\s*)=(?P<pre_value>\s*)(?P<value>.+)(?P<post_value>\s*)[}](?P<post_line>\s*)$
+# EntryEndLine:     ^(?P<pre_line>\s*)[}](?P<post_line>.*)$
+
 type_regexes = {
     EmptyLine: r'^\s*$',
-    CommentLine: rf'^{pre("line")}%(?P<comment>.*)$',
     EntryStartLine: rf'^{pre("line")}@{part("type")}{post("type")}[{{]{pre("key")}{part("key")}{post("key")},{post("line")}$',
     FieldLine: rf'^{pre("line")}{part("name")}{post("name")}={pre("value")}(?P<value>.+){post("value")},{post("line")}$',
     LastFieldLine: rf'^{pre("line")}{part("name")}{post("name")}={pre("value")}(?P<value>.+){post("line")}$',
     ClosingFieldLine: rf'^{pre("line")}{part("name")}{post("name")}={pre("value")}(?P<value>.+){post("value")}[}}]{post("line")}$',
-    EntryEndLine: rf'^{pre("line")}[}}](?P<post_line>.*)$'  # ^(?P<pre_line>\s*)[}](?P<post_line>.*)$
+    EntryEndLine: rf'^{pre("line")}[}}](?P<post_line>.*)$'
 }
