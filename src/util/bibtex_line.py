@@ -20,6 +20,7 @@ class Line(object):
         self.pre_line: typing.Optional[str] = None
         self.post_line: typing.Optional[str] = None
         self.line_number: int = line_number
+        self.context: typing.Optional[Context] = None
 
 
 class EmptyLine(Line):
@@ -102,3 +103,20 @@ type_regexes = {
     ClosingFieldLine: rf'^{pre("line")}{part("name")}{post("name")}={pre("value")}(?P<value>.+){post("value")}[}}]{post("line")}$',
     EntryEndLine: rf'^{pre("line")}[}}](?P<post_line>.*)$'
 }
+
+
+class Context(object):
+    def __init__(self):
+        self.lines: typing.List[Line] = []
+
+    def index_of(self, line: Line) -> typing.Optional[int]:
+        return self.lines.index(line)
+
+    def is_last(self, line: Line) -> bool:
+        return self.lines and self.lines[-1] == line
+
+    def is_first(self, line: Line) -> bool:
+        return self.lines and self.lines[0] == line
+
+    def __str__(self):
+        return '\n'.join(line.raw for line in self.lines)

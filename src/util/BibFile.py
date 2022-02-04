@@ -5,8 +5,8 @@ import typing
 import bibtexparser
 import glob2
 
-from src.commands.check.bibtex_line import Line, type_regexes, UnrecognizedLine, EntryStartLine, FieldLine, \
-    LastFieldLine
+from src.util.bibtex_line import Line, type_regexes, UnrecognizedLine, EntryStartLine, Context, ClosingFieldLine, \
+    EntryEndLine, FieldLine, LastFieldLine
 from src.util.BibEntry import BibEntry
 
 
@@ -40,6 +40,7 @@ class BibFile(object):
         self._bibliography: bibtexparser.bibdatabase.BibDatabase
         self._entries: typing.List[BibEntry] = []
         self._preprocessed_lines: typing.List[Line] = []
+        self._contexts: typing.List[Context] = []
 
         # Parse .bib file
         parser = bibtexparser.bparser.BibTexParser(common_strings=True, ignore_nonstandard_types=False)
@@ -54,6 +55,7 @@ class BibFile(object):
 
         # Preprocess lines
         self._preprocess_lines()
+        self._preprocess_contexts()
 
     @property
     def file_path(self) -> str:
@@ -66,6 +68,10 @@ class BibFile(object):
     @property
     def preprocessed_lines(self) -> typing.List[Line]:
         return self._preprocessed_lines
+
+    @property
+    def contexts(self) -> typing.List[Context]:
+        return self._contexts
 
     def __iter__(self):
         return iter(self._entries)
@@ -95,22 +101,44 @@ class BibFile(object):
         """
 
         self._preprocessed_lines: typing.List[Line] = []
+        is_in_entry: bool = False
+
         with open(self._file_path, 'r', encoding='utf-8') as raw_file:
             for index, line in enumerate(raw_file):
                 for _type, regex in type_regexes.items():
                     match = re.search(regex, line)
                     if match:
-                        if len(self._preprocessed_lines) > 0 \
-                                and type(self._preprocessed_lines[-1]) not in [EntryStartLine, FieldLine, LastFieldLine] \
-                                and _type in [FieldLine, LastFieldLine] and match:
+                        # Store line as UnrecognizedLine if it is not in an entry
+                        if not is_in_entry and _type in [FieldLine, LastFieldLine, ClosingFieldLine, EntryEndLine]:
                             self._preprocessed_lines.append(UnrecognizedLine(line, index + 1))
                             break
-                        self._preprocessed_lines.append(_type(line, match, index + 1))
+
+                        preprocessed_line: Line = _type(line, match, index + 1)
+                        if isinstance(preprocessed_line, EntryStartLine):
+                            is_in_entry = True
+                        elif isinstance(preprocessed_line, (ClosingFieldLine, EntryEndLine)):
+                            is_in_entry = False
+
+                        self._preprocessed_lines.append(preprocessed_line)
                         break
                 else:
                     self._preprocessed_lines.append(UnrecognizedLine(line, index + 1))
 
-        # Debug lines
-        # TODO: Remove
+    def _preprocess_contexts(self):
+        """
+        Preprocesses the contexts of the BibTeX file.
+        """
+
+        context: typing.Optional[Context] = None
         for line in self._preprocessed_lines:
-            print("Line", line.line_number, ":", type(line).__name__, line.raw, end="")
+            if isinstance(line, EntryStartLine):
+                if context:
+                    self._contexts.append(context)
+                context = Context()
+
+            if context:
+                context.lines.append(line)
+                line.context = context
+                if isinstance(line, (EntryEndLine, ClosingFieldLine)):
+                    self._contexts.append(context)
+                    context = None

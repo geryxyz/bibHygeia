@@ -5,9 +5,8 @@ from argparse import ArgumentParser
 
 from src.commands.Command import Command, bibhygeia_command
 from src.util import *
-from src.util.BibEntry import BibEntry
 
-bibs: typing.List[BibFile] = []
+bib_files: typing.List[BibFile] = []
 
 
 def run_tests() -> None:
@@ -15,26 +14,7 @@ def run_tests() -> None:
     config_file_path = "''"  # Ignore other config files
 
     # -s is for printing out the program outputs
-    pytest.main([file_dir_path, "--junitxml=test_results.xml", "-c", config_file_path])
-
-
-def input_biber_files() -> typing.List[BibFile]:
-    """
-    Iterates over the bib files and yields the bib files.
-    """
-
-    for bib_file in bibs:
-        yield bib_file
-
-
-def input_biber_entries() -> typing.List[BibEntry]:
-    """
-    Iterates over the bib files and yields the biber entries.
-    """
-
-    for bib_file in bibs:
-        for entry in bib_file:
-            yield entry
+    pytest.main([file_dir_path, "-s", "--junitxml=test_results.xml", "-c", config_file_path])
 
 
 @bibhygeia_command(name="check", description="Checks BibTeX entries in the given path.")
@@ -52,9 +32,9 @@ class CheckCommand(Command):
         parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     def run(self, args: typing.Any) -> None:
-        global bibs
+        global bib_files
 
         self.bib_files = BibFile.read_bib_files(args.path)
-        bibs = self.bib_files
+        bib_files = self.bib_files
 
         run_tests()
