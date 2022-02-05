@@ -63,3 +63,14 @@ def line_idfn(prefix: str = "Line"):
             return "%s %d" % (prefix, fixture_value.line_number)
         return None
     return _line_idfn
+
+
+def get_entry_by_id(id: str) -> BibEntry | None:
+    """
+    Returns the entry with the given ID.
+    """
+
+    for entry in biber_entries_gen():
+        if entry.id == id:
+            return entry
+    return None

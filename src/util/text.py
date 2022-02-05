@@ -170,11 +170,11 @@ def parts_of(value):
 
 
 @functools.lru_cache()
-def jaccard_of(value, other_value):
-    parts = parts_of(value)
-    other_parts = parts_of(other_value)
-    common_parts = [part for part in parts if part in other_parts]
-    return len(common_parts) / (len(parts) + len(other_parts) - len(common_parts))
+def jaccard_similarity(value, other_value):
+    parts = set(parts_of(value))
+    other_parts = set(parts_of(other_value))
+    intersection = parts.intersection(other_parts)
+    return len(intersection) / (len(parts) + len(other_parts) - len(intersection))
 
 
 SHORT_MSG_LENGTH = 2000
