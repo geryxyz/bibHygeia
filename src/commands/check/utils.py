@@ -1,9 +1,9 @@
 import typing
 
 from src.util import BibFile, BibEntry
+from src.util.bibtex_line import Line, Context
 
 from .CheckCommand import bib_files
-from src.util.bibtex_line import Line, Context
 
 
 def biber_files_gen() -> typing.List[BibFile]:

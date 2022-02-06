@@ -11,7 +11,7 @@ bib_files: typing.List[BibFile] = []
 
 def run_tests() -> None:
     file_dir_path = os.path.dirname(os.path.realpath(__file__))
-    config_file_path = "''"  # Ignore other config files
+    config_file_path = os.path.join(file_dir_path, "pytest.ini")
 
     # -s is for printing out the program outputs
     pytest.main([file_dir_path, "-s", "--junitxml=test_results.xml", "-c", config_file_path])

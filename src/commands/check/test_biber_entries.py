@@ -1,14 +1,13 @@
 import re
 import pytest
 
-from src.util.text import OMISSION_CHAR, TranscriptionFunctions, jaccard_similarity
+from src.util.text import TranscriptionFunctions, OMISSION_CHAR, jaccard_similarity
 from src.util.BibEntry import BibEntry
+from src.util.constants import DUPLICATION_THRESHOLD, IGNORE_DUPLICATION_PROPERTY_NAME
 
 from .fields_per_types import fields_per_types
+from .hint_entries import hint_readable_id
 from .utils import biber_entries_gen, get_entry_by_id
-
-IGNORE_DUPLICATION_PROPERTY_NAME = "noduplication"
-DUPLICATION_THRESHOLD = 0.8
 
 
 @pytest.mark.parametrize("entry", biber_entries_gen(), ids=lambda entry: entry.id)
@@ -18,6 +17,7 @@ def test_characters_in_id(entry: BibEntry):
 
 
 @pytest.mark.parametrize("entry", biber_entries_gen(), ids=lambda entry: entry.id)
+@pytest.mark.usefixtures(hint_readable_id.__name__)
 def test_readable_id(entry: BibEntry):
     clean_title = TranscriptionFunctions.lower(TranscriptionFunctions.drop_specials(entry["title"]))
     assert re.match(rf"^{clean_title}", entry.id), \
