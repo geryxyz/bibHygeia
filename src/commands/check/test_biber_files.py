@@ -24,7 +24,8 @@ def test_correct_indentation_for_end(line: EntryEndLine):
 
 @pytest.mark.parametrize("line", lines_gen(EntryStartLine, FieldLine, LastFieldLine, ClosingFieldLine, EntryEndLine),
                          ids=line_idfn())
-def test_no_trailing_spaces(line: typing.Union[EntryStartLine, FieldLine, LastFieldLine, ClosingFieldLine, EntryEndLine]):
+def test_no_trailing_spaces(
+        line: typing.Union[EntryStartLine, FieldLine, LastFieldLine, ClosingFieldLine, EntryEndLine]):
     print("Debug post line:", "|", line.post_line, "|")
     assert line.post_line in ('\n', ''), \
         'no whitespace allowed after starting/closing entry specification or field specification'

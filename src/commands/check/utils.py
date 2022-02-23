@@ -62,10 +62,20 @@ def line_idfn(prefix: str = "Line"):
         if isinstance(fixture_value, Line):
             return "%s %d" % (prefix, fixture_value.line_number)
         return None
+
     return _line_idfn
 
 
-def get_entry_by_id(id: str) -> BibEntry | None:
+def entry_idfn():
+    def _entry_idfn(fixture_value: typing.Any):
+        if isinstance(fixture_value, BibEntry):
+            return fixture_value.id
+        return None
+
+    return _entry_idfn
+
+
+def get_entry_by_id(id: str) -> typing.Union[BibEntry, None]:
     """
     Returns the entry with the given ID.
     """
