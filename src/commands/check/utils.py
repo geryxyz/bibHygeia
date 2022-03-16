@@ -76,7 +76,7 @@ def line_idfn(prefix: str = "Line"):
 
 def entry_idfn(entry: BibEntry):
     if isinstance(entry, BibEntry):
-        return entry.id
+        return entry.key
     return None
 
 
@@ -94,21 +94,21 @@ def biber_entries_with_field_quantifiers_idfn(entry_quantifier: BibEntryQuantifi
         return None
 
     if isinstance(entry_quantifier.quantifier, (Mandatory, Forbidden)):
-        return f"{entry_quantifier.entry.id}_{entry_quantifier.quantifier.__class__.__name__}_{entry_quantifier.quantifier.name}"
+        return f"{entry_quantifier.entry.key}_{entry_quantifier.quantifier.__class__.__name__}_{entry_quantifier.quantifier.name}"
 
     elif isinstance(entry_quantifier.quantifier, (AllOf, AtLeastOneOf, MaybeOneOf)):
-        return f"{entry_quantifier.entry.id}_{entry_quantifier.quantifier.__class__.__name__}_" + \
+        return f"{entry_quantifier.entry.key}_{entry_quantifier.quantifier.__class__.__name__}_" + \
                "-".join(entry_quantifier.quantifier.names)
 
     return None
 
 
-def get_entry_by_id(id: str) -> typing.Union[BibEntry, None]:
+def get_entry_by_key(key: str) -> typing.Union[BibEntry, None]:
     """
-    Returns the entry with the given ID.
+    Returns the entry with the given key.
     """
 
     for entry in biber_entries_gen():
-        if entry.id == id:
+        if entry.key == key:
             return entry
     return None
