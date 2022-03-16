@@ -2,8 +2,10 @@ import typing
 
 from src.util import BibFile, BibEntry
 from src.util.bibtex_line import Line, Context
-
+from src.util.quantifier import Quantifier, Forbidden, Mandatory, AllOf, AtLeastOneOf, MaybeOneOf
+from .BibEntryQuantifierPair import BibEntryQuantifierPair
 from .CheckCommand import bib_files
+from .fields_per_types import fields_per_types
 
 
 def biber_files_gen() -> typing.List[BibFile]:
@@ -53,6 +55,12 @@ def lines_in_contexts_gen() -> typing.List[Line]:
             yield from context.lines
 
 
+def biber_entries_with_field_quantifiers_gen():
+    for entry in biber_entries_gen():
+        for quantifier in fields_per_types.get(entry.entry_type, ()):
+            yield BibEntryQuantifierPair(entry, quantifier)
+
+
 def line_idfn(prefix: str = "Line"):
     """
     Returns a function that returns an ID for a line in the test.
@@ -66,13 +74,33 @@ def line_idfn(prefix: str = "Line"):
     return _line_idfn
 
 
-def entry_idfn():
-    def _entry_idfn(fixture_value: typing.Any):
-        if isinstance(fixture_value, BibEntry):
-            return fixture_value.id
+def entry_idfn(entry: BibEntry):
+    if isinstance(entry, BibEntry):
+        return entry.id
+    return None
+
+
+def quantifier_idfn(quantifier: Quantifier):
+    if isinstance(quantifier, (Mandatory, Forbidden)):
+        return quantifier.name
+    elif isinstance(quantifier, (AllOf, AtLeastOneOf, MaybeOneOf)):
+        return "-".join(quantifier.names)
+
+    return None
+
+
+def biber_entries_with_field_quantifiers_idfn(entry_quantifier: BibEntryQuantifierPair):
+    if not isinstance(entry_quantifier, BibEntryQuantifierPair):
         return None
 
-    return _entry_idfn
+    if isinstance(entry_quantifier.quantifier, (Mandatory, Forbidden)):
+        return f"{entry_quantifier.entry.id}_{entry_quantifier.quantifier.__class__.__name__}_{entry_quantifier.quantifier.name}"
+
+    elif isinstance(entry_quantifier.quantifier, (AllOf, AtLeastOneOf, MaybeOneOf)):
+        return f"{entry_quantifier.entry.id}_{entry_quantifier.quantifier.__class__.__name__}_" + \
+               "-".join(entry_quantifier.quantifier.names)
+
+    return None
 
 
 def get_entry_by_id(id: str) -> typing.Union[BibEntry, None]:

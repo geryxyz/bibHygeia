@@ -1,5 +1,6 @@
-import typing
 import re
+import typing
+
 import pytest
 
 from src.util.bibtex_line import Line, EntryStartLine, EntryEndLine, LastFieldLine, FieldLine, EmptyLine, \
