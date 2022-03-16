@@ -27,6 +27,9 @@ class BibFile(object):
         :return: A list of BibFile objects.
         """
 
+        if os.path.isfile(path):
+            return [BibFile(path)]
+
         bib_file_names: typing.List[str] = glob2.glob(os.path.join(path, "**", "*.bib"), recursive=is_recursive)
         bib_files: typing.List["BibFile"] = []
 
