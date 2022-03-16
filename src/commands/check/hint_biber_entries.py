@@ -10,37 +10,37 @@ from .fields_per_types import fields_per_types
 
 
 @pytest.fixture()
-def hint_remove_invalid_characters_from_id(entry: BibEntry, store_hint):
-    clean_id = re.sub(r'[^a-zA-Z0-9_-]', '', entry.id)
-    if entry.id != clean_id:
-        store_hint(Hint(title='Valid BibTeX ID',
-                        recommendation=f'Change the entry ID to "{clean_id}".',
-                        reason='The entry ID contains characters that are not allowed in BibTeX IDs.',
-                        phase='remove_invalid_characters_from_id'))
+def hint_remove_invalid_characters_from_key(entry: BibEntry, store_hint):
+    clean_key = re.sub(r'[^a-zA-Z0-9_-]', '', entry.key)
+    if entry.key != clean_key:
+        store_hint(Hint(title='Valid BibTeX key',
+                        recommendation=f'Change the entry key to "{clean_key}".',
+                        reason='The entry key contains characters that are not allowed in BibTeX keys.',
+                        phase='remove_invalid_characters_from_key'))
 
 
 @pytest.fixture()
-def hint_normalize_characters_in_id(entry: BibEntry, store_hint):
-    normalized_id = re.sub(r'[^a-zA-Z0-9_-]', '', unidecode(entry.id))
-    if entry.id != normalized_id:
-        store_hint(Hint(title='Valid BibTeX ID',
-                        recommendation=f'Change the entry ID to "{normalized_id}".',
-                        reason='The entry ID contains characters that are not allowed in BibTeX IDs.',
-                        phase='normalize_characters_in_id'))
+def hint_normalize_characters_in_key(entry: BibEntry, store_hint):
+    normalized_key = re.sub(r'[^a-zA-Z0-9_-]', '', unidecode(entry.key))
+    if entry.key != normalized_key:
+        store_hint(Hint(title='Valid BibTeX key',
+                        recommendation=f'Change the entry key to "{normalized_key}".',
+                        reason='The entry key contains characters that are not allowed in BibTeX keys.',
+                        phase='normalize_characters_in_key'))
 
 
 @pytest.fixture()
-def hint_readable_id(entry: BibEntry, store_hint):
+def hint_readable_key(entry: BibEntry, store_hint):
     if entry['title'] is None:
         return
 
     clean_title = TranscriptionFunctions.lower(TranscriptionFunctions.drop_specials(entry['title']))
     if entry['title'] != clean_title:
-        store_hint(Hint(title='title-based key',
-                        recommendation=f'Change the key of "{entry.id}" to (at least starts with) "{clean_title}" in line {entry.line_number}.',
+        store_hint(Hint(title='Title based key',
+                        recommendation=f'Change the key of "{entry.key}" to (at least starts with) "{clean_title}" in line {entry.line_number}.',
                         reason='Most of the editor will offer suggestions and prefill the keys;'
                                ' furthermore these keys are easier to read during writing.',
-                        phase='title_as_key'))
+                        phase='readable_key'))
 
 
 @pytest.fixture()

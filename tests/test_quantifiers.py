@@ -28,7 +28,7 @@ test_entry_bad = BibEntry({
 @pytest.mark.parametrize("quantifier", mandatory_quantifiers())
 def test_mandatory_check_should_not_raise_assertion_error(quantifier: Mandatory):
     try:
-        quantifier.check(test_entry_good.id, test_entry_good)
+        quantifier.check(test_entry_good.key, test_entry_good)
     except AssertionError:
         pytest.fail("Mandatory quantifier should not raise assertion error if field is present")
 
@@ -36,7 +36,7 @@ def test_mandatory_check_should_not_raise_assertion_error(quantifier: Mandatory)
 @pytest.mark.parametrize("quantifier", mandatory_quantifiers())
 def test_mandatory_check_should_raise_assertion_error(quantifier: Mandatory):
     with pytest.raises(AssertionError) as e:
-        quantifier.check(test_entry_bad.id, test_entry_bad)
+        quantifier.check(test_entry_bad.key, test_entry_bad)
 
     assert "is mandatory in entry" in str(e.value), \
         "Mandatory quantifier should raise assertion error if field is missing"

@@ -7,7 +7,7 @@ class BibEntry(object):
         self._line_number = line_number
 
     @property
-    def id(self) -> str:
+    def key(self) -> str:
         return self._fields["ID"]
 
     @property
@@ -29,4 +29,4 @@ class BibEntry(object):
         return self._fields.get(item, None)
 
     def __str__(self) -> str:
-        return f"{self.id}_{self.entry_type}"
+        return f"{self.key}_{self.entry_type}"
