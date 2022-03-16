@@ -26,7 +26,7 @@ class BibEntry(object):
         return iter(self._fields)
 
     def __getitem__(self, item: str) -> typing.Any:
-        return self._fields[item]
+        return self._fields.get(item, None)
 
     def __str__(self) -> str:
         return f"{self.id}_{self.entry_type}"
