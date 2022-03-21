@@ -5,18 +5,20 @@ import pytest
 from src.util.BibEntry import BibEntry
 from src.util.constants import DUPLICATION_THRESHOLD, IGNORE_DUPLICATION_PROPERTY_NAME
 from src.util.text import TranscriptionFunctions, jaccard_similarity
-from .BibEntryQuantifierPair import BibEntryQuantifierPair
 from .fields_per_types import fields_per_types
 # noinspection PyUnresolvedReferences
+# pylint: disable=unused-import
 from .hint_biber_entries import hint_remove_invalid_characters_from_key, hint_normalize_characters_in_key, \
     hint_readable_key, hint_valid_entry_type, hint_similar_entry_type
 from .utils import biber_entries_gen, get_entry_by_key, entry_idfn, \
     biber_entries_with_field_quantifiers_idfn, biber_entries_with_field_quantifiers_gen
+from ...util.quantifier import Quantifier
 
 
 @pytest.mark.parametrize("entry", biber_entries_gen(), ids=entry_idfn)
 def test_characters_in_key(entry: BibEntry, hint_remove_invalid_characters_from_key, hint_normalize_characters_in_key):
-    assert re.match(rf"^[a-zA-Z0-9_-]+$", entry.key) is not None
+    assert re.match(r"^[a-zA-Z0-9_-]+$", entry.key) is not None, \
+        "Key contains invalid characters. Key should only contain letters, numbers, underscores and dashes"
 
 
 @pytest.mark.parametrize("entry", biber_entries_gen(), ids=entry_idfn)
@@ -26,18 +28,21 @@ def test_readable_key(entry: BibEntry, hint_readable_key):
 
     clean_title = TranscriptionFunctions.lower(TranscriptionFunctions.drop_specials(entry["title"]))
     assert re.match(rf"^{clean_title}", entry.key), \
-        'Key "%s" should start with an easy to read version of the title' % entry.key
+        'Key should start with an easy to read version of the title'
 
 
 @pytest.mark.parametrize("entry", biber_entries_gen(), ids=entry_idfn)
 def test_entry_type(entry: BibEntry, hint_valid_entry_type, hint_similar_entry_type):
-    assert entry.entry_type in fields_per_types.keys(), 'Entry type "%s" is not valid' % entry.entry_type
+    assert entry.entry_type in fields_per_types.keys(), \
+        'Entry type "%s" is not valid' % entry.entry_type
 
 
-@pytest.mark.parametrize("entry_quantifier", biber_entries_with_field_quantifiers_gen(),
-                         ids=biber_entries_with_field_quantifiers_idfn)
-def test_field_type(entry_quantifier: BibEntryQuantifierPair):
-    entry_quantifier.quantifier.check(entry_quantifier.entry.key, entry_quantifier.entry)
+# TODO remove BibEntryQuantifierPair class and depending methods
+@pytest.mark.parametrize("entry, quantifier", biber_entries_with_field_quantifiers_gen(),
+                         ids=biber_entries_with_field_quantifiers_idfn
+                         )
+def test_field_type(entry: BibEntry, quantifier: Quantifier):
+    quantifier.check(entry.key, entry)
 
 
 @pytest.mark.parametrize("entry", biber_entries_gen(), ids=entry_idfn)
@@ -66,7 +71,8 @@ def test_right_use_of_noduplication(entry: BibEntry):
     ignored_keys = [k for k in entry.fields.get(IGNORE_DUPLICATION_PROPERTY_NAME, '').split(',') if k != '']
     for ignored_key in ignored_keys:
         assert get_entry_by_key(ignored_key), \
-            'Unknown key "%s" specified as %s in entry "%s"' % (ignored_key, IGNORE_DUPLICATION_PROPERTY_NAME, entry.key)
+            'Unknown key "%s" specified as %s in entry "%s"' % (
+                ignored_key, IGNORE_DUPLICATION_PROPERTY_NAME, entry.key)
 
         _entry = get_entry_by_key(ignored_key)
         similarity = jaccard_similarity(entry["title"], _entry["title"])

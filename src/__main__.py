@@ -18,5 +18,9 @@ def main():
         subparser.set_defaults(func=cmd.run)
         cmd.make_parser(subparser)
 
-    args = parser.parse_args()
-    args.func(args)
+    p_args = parser.parse_args()
+    p_args.func(p_args)
+
+
+if __name__ == "__main__":
+    main()

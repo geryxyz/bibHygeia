@@ -1,0 +1,14 @@
+.failure-message {
+    color: var(--bs-red);
+    font-weight: bold;
+}
+
+.hint {
+    border: 1px solid var(--bs-gray-400);
+    border-radius: 0.3rem !important;
+    border-left: 4px solid var(--bs-yellow);
+
+    margin-top: 1.25rem;
+
+    padding: 0.5rem;
+}
