@@ -4,3 +4,11 @@ class Hint(object):
         self.recommendation: str = recommendation
         self.reason: str = reason
         self.phase: str = phase
+
+    def to_dict(self):
+        return {
+            "title": self.title,
+            "recommendation": self.recommendation,
+            "reason": self.reason,
+            "phase": self.phase
+        }

@@ -46,8 +46,6 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
-test_results.xml
-test_hints.xml
 
 # Translations
 *.mo
@@ -573,4 +571,5 @@ dmypy.json
 
 # End of https://www.toptal.com/developers/gitignore/api/latex,python,pycharm
 
-reports/
+# bibHygeia
+report/**

@@ -15,22 +15,23 @@ def part(name: str):
 
 
 class Line(object):
-    def __init__(self, raw: str, line_number: int):
+    def __init__(self, raw: str, file_path: str, line_number: int):
         self.raw: str = raw
         self.pre_line: typing.Optional[str] = None
         self.post_line: typing.Optional[str] = None
+        self.file_path: str = file_path
         self.line_number: int = line_number
         self.context: typing.Optional[Context] = None
 
 
 class EmptyLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, match: re.Match, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
 
 
 class EntryStartLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, match: re.Match, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
         self.pre_line: str = match.group('pre_line')
         self.type: str = match.group('type')
         self.post_type: str = match.group('post_type')
@@ -41,8 +42,8 @@ class EntryStartLine(Line):
 
 
 class FieldLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, match: re.Match, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
         self.pre_line: str = match.group('pre_line')
         self.name: str = match.group('name')
         self.post_name: str = match.group('post_name')
@@ -53,8 +54,8 @@ class FieldLine(Line):
 
 
 class LastFieldLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, match: re.Match, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
         self.pre_line: str = match.group('pre_line')
         self.name: str = match.group('name')
         self.post_name: str = match.group('post_name')
@@ -64,8 +65,8 @@ class LastFieldLine(Line):
 
 
 class ClosingFieldLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, match: re.Match, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
         self.pre_line: str = match.group('pre_line')
         self.name: str = match.group('name')
         self.post_name: str = match.group('post_name')
@@ -76,15 +77,15 @@ class ClosingFieldLine(Line):
 
 
 class EntryEndLine(Line):
-    def __init__(self, raw: str, match: re.Match, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, match: re.Match, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
         self.pre_line: str = match.group('pre_line')
         self.post_line: str = match.group('post_line')
 
 
 class UnrecognizedLine(Line):
-    def __init__(self, raw: str, line_number: int):
-        super().__init__(raw, line_number)
+    def __init__(self, raw: str, file_path: str, line_number: int):
+        super().__init__(raw, file_path, line_number)
 
 
 # Regexes:

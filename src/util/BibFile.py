@@ -39,7 +39,7 @@ class BibFile(object):
         return bib_files
 
     def __init__(self, file_path: str):
-        self._file_path: str = file_path
+        self._file_path = file_path
         self._bibliography: bibtexparser.bibdatabase.BibDatabase
         self._entries: typing.List[BibEntry] = []
         self._preprocessed_lines: typing.List[Line] = []
@@ -54,7 +54,7 @@ class BibFile(object):
         for entry in self._bibliography.entries:
             entry_line_number = self.line_of(entry["ID"])
             if entry_line_number:
-                self._entries.append(BibEntry(entry, entry_line_number))
+                self._entries.append(BibEntry(entry, file_path, entry_line_number))
 
         # Preprocess lines
         self._preprocess_lines()
@@ -88,14 +88,15 @@ class BibFile(object):
     def line_of(self, key: str) -> typing.Union[int, None]:
         """
         :param key: The key of the entry.
-        :return: The line index of the entry or None if the entry is not found.
+        :return: The line number of the entry or None if the entry is not found.
         """
 
+        # TODO: Optimization: Use a dictionary to map keys to line numbers in the init method.
         with open(self._file_path, "r", encoding="utf-8") as bibfile:
             for index, line in enumerate(bibfile):
                 line = line.strip()
                 if re.match(rf"^\s*@\w+{{{key}", line):
-                    return index
+                    return index + 1
         return None
 
     def _preprocess_lines(self):
@@ -113,10 +114,10 @@ class BibFile(object):
                     if match:
                         # Store line as UnrecognizedLine if it is not in an entry
                         if not is_in_entry and _type in [FieldLine, LastFieldLine, ClosingFieldLine, EntryEndLine]:
-                            self._preprocessed_lines.append(UnrecognizedLine(line, index + 1))
+                            self._preprocessed_lines.append(UnrecognizedLine(line, self.file_path, index + 1))
                             break
 
-                        preprocessed_line: Line = _type(line, match, index + 1)
+                        preprocessed_line: Line = _type(line, match, self.file_path, index + 1)
                         if isinstance(preprocessed_line, EntryStartLine):
                             is_in_entry = True
                         elif isinstance(preprocessed_line, (ClosingFieldLine, EntryEndLine)):
@@ -125,7 +126,7 @@ class BibFile(object):
                         self._preprocessed_lines.append(preprocessed_line)
                         break
                 else:
-                    self._preprocessed_lines.append(UnrecognizedLine(line, index + 1))
+                    self._preprocessed_lines.append(UnrecognizedLine(line, self.file_path, index + 1))
 
     def _preprocess_contexts(self):
         """

@@ -58,7 +58,7 @@ def lines_in_contexts_gen() -> typing.List[Line]:
 def biber_entries_with_field_quantifiers_gen():
     for entry in biber_entries_gen():
         for quantifier in fields_per_types.get(entry.entry_type, ()):
-            yield BibEntryQuantifierPair(entry, quantifier)
+            yield entry, quantifier
 
 
 def line_idfn(prefix: str = "Line"):
