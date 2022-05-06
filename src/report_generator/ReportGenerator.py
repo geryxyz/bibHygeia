@@ -1,18 +1,19 @@
 import json
 import os
 import re
+import sys
 import time
 import typing
 
 import pytest
 
+from src.report_generator.Report import Report
+from src.report_generator.failure.EntryCheckFailure import EntryCheckFailure
+from src.report_generator.failure.FileLineCheckFailure import FileLineCheckFailure
 from src.util import Hint
 from src.util.BibEntry import BibEntry
 from src.util.Singleton import Singleton
 from src.util.bibtex_line import Line
-from src.report_generator.failure.EntryCheckFailure import EntryCheckFailure
-from src.report_generator.failure.FileLineCheckFailure import FileLineCheckFailure
-from src.report_generator.Report import Report
 
 
 class ReportGenerator(object, metaclass=Singleton):
@@ -24,6 +25,7 @@ class ReportGenerator(object, metaclass=Singleton):
     report: Report
 
     def __init__(self):
+        self.console_stdout = sys.stdout
         self.report = Report()
 
     @pytest.hookimpl(tryfirst=True, hookwrapper=True)
@@ -63,6 +65,13 @@ class ReportGenerator(object, metaclass=Singleton):
         self.report.end_time = time.time()
         self._write_report()
 
+    @pytest.hookimpl(tryfirst=True)
+    def pytest_configure(self, config: pytest.Config):
+        sys.stdout = open(os.devnull, "w")
+
+    def pytest_unconfigure(self, config: pytest.Config):
+        sys.stdout = self.console_stdout
+
     def _add_entry_check_failure(self, entry: BibEntry, failure: str, hints: typing.List[Hint]):
         self.report.add_entry(entry)  # TODO: Add every entry, not just the affected one
         self.report.add_failure(EntryCheckFailure(entry, failure, hints))
@@ -92,3 +101,8 @@ class ReportGenerator(object, metaclass=Singleton):
 
             with open(os.path.join(report_base_path, resource_file), "w") as target_fp:
                 target_fp.write(resource_data)
+
+        self._print("Written report summary to:", report_base_path)
+
+    def _print(self, *values: object):
+        print(*values, file=self.console_stdout)

@@ -12,10 +12,17 @@ bib_files: typing.List[BibFile] = []
 
 
 def run_tests() -> None:
+    print("Running checks...")
     file_dir_path = os.path.dirname(os.path.realpath(__file__))
 
     # -s is for printing out the program outputs
-    sys.exit(pytest.main([file_dir_path, "-s", "--tb=no"]))
+
+    pytest_exit = pytest.main([file_dir_path,
+                               "--tb=no",  # no traceback
+                               "-c=''",  # prevent pytest from reading pytest.ini from root directory
+                               "--no-header", "--no-summary", "-q"])
+
+    sys.exit(pytest_exit)
 
 
 @bibhygeia_command(name="check", description="Checks BibTeX entries in the given path.")
