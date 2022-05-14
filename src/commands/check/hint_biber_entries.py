@@ -37,7 +37,7 @@ def hint_readable_key(entry: BibEntry, store_hint):
     clean_title = TranscriptionFunctions.lower(TranscriptionFunctions.drop_specials(entry['title']))
     if entry['title'] != clean_title:
         store_hint(Hint(title='Title based key',
-                        recommendation=f'Change the key of "{entry.key}" to (at least starts with) "{clean_title}" in line {entry.line_number}.',
+                        recommendation=f'Change the key of "{entry.key}" to (at least starts with) "{clean_title}".',
                         reason='Most of the editor will offer suggestions and prefill the keys;'
                                ' furthermore these keys are easier to read during writing.',
                         phase='readable_key'))
@@ -60,7 +60,7 @@ def hint_similar_entry_type(entry: BibEntry, store_hint):
 @pytest.fixture()
 def hint_valid_entry_type(entry: BibEntry, store_hint):
     if entry.entry_type not in fields_per_types.keys():
-        store_hint(Hint(title=f'Valid BibTeX entry type',
-                        recommendation=f'Please use a valid BibTeX entry type.',
+        store_hint(Hint(title='Valid BibTeX entry type',
+                        recommendation='Please use a valid BibTeX entry type.',
                         reason='We use the types specified at https://en.wikipedia.org/wiki/BibTeX#Entry_types',
                         phase='valid_entry_type'))

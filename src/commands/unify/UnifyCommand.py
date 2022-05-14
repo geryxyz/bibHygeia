@@ -1,10 +1,10 @@
 import typing
 from argparse import ArgumentParser
 
-from src.commands.Command import Command, bibhygeia_command
+from src.commands.Command import Command, register_command
 
 
-@bibhygeia_command(name="unify", description="Unifies BibTeX records")
+@register_command(name="unify", description="Unifies BibTeX records")
 class UnifyCommand(Command):
     """
     This Command unifies BibTeX records.

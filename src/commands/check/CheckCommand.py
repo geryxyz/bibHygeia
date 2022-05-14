@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 
 import pytest
 
-from src.commands.Command import Command, bibhygeia_command
+from src.commands.Command import Command, register_command
 from src.util import *
 
 bib_files: typing.List[BibFile] = []
@@ -25,7 +25,7 @@ def run_tests() -> None:
     sys.exit(pytest_exit)
 
 
-@bibhygeia_command(name="check", description="Checks BibTeX entries in the given path.")
+@register_command(name="check", description="Checks BibTeX entries in the given path.")
 class CheckCommand(Command):
     """
     This Command checks BibTeX entries in the given path.
@@ -37,7 +37,6 @@ class CheckCommand(Command):
 
     def make_parser(self, parser: ArgumentParser) -> None:
         parser.add_argument("path", metavar="PATH", help="Path to check for .bib files recursively")
-        parser.add_argument("-v", "--verbose", action="store_true", help="Verbose output")
 
     def run(self, args: typing.Any) -> None:
         global bib_files

@@ -1,10 +1,10 @@
 import typing
 from argparse import ArgumentParser
 
-from src.commands.Command import Command, bibhygeia_command
+from src.commands.Command import Command, register_command
 
 
-@bibhygeia_command(name="dedup", description="Remove duplications from .bib files.")
+@register_command(name="dedup", description="Remove duplications from .bib files.")
 class DedupCommand(Command):
     """
     This Command removes duplicated BibTeX entries from .bib files.

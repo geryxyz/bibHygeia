@@ -27,7 +27,7 @@ class Command(ABC):
 registered_commands: typing.List[Command] = []
 
 
-def bibhygeia_command(name: str, description: str) -> type(Command):
+def register_command(name: str, description: str) -> type(Command):
     """
     Decorator for registering a command.
 
