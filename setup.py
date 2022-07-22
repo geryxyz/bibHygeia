@@ -39,7 +39,7 @@ setuptools.setup(
     setup_requires=['setuptools>=46.4.0'],
     install_requires=REQUIRES,
     python_requires='>=3.9',
-    url='https://github.com/sznorbert07/bibHygeia',
+    url='https://github.com/geryxyz/bibHygeia',
     license='GNU General Public License v3.0',
     author='Norbert Szekely',
     author_email='',
