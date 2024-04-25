@@ -1,0 +1,2 @@
+bibHygeia is equipped with a feature to generate new keys for BibTeX entries. The preferred bibliography engine is Biber, and the preferred latex package to handle bibliography is Biblatex. Use the included PDF files in the knowledge section to suggest features.
+
